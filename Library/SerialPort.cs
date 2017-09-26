@@ -12,8 +12,6 @@ namespace Library
 {
     public class SerialPort
     {
-        Mutex _mutex = new Mutex();
-        bool _lock;
 
         Queue<byte[]> _sendQueue = new Queue<byte[]>();
         public enum Status
@@ -70,9 +68,8 @@ namespace Library
 
             _parser = new Parser();
             _parser.MessageParsed += _parser_MessageParsed;
-        }
 
-        
+        }
 
         private void _parser_MessageParsed(byte[] data)
         {
@@ -215,20 +212,8 @@ namespace Library
                 {
                     try
                     {
-                        if (!_lock)
-                        {
-                            _mutex.WaitOne();
-                            _lock = true;
-                        }
-
                         _serialPort.Write(d, 0, d.Length);
 
-                        if (_lock)
-                        {
-                            _mutex.ReleaseMutex();
-                            _lock = false;
-                        }
-                       
                     }
                     catch (Exception ex)
                     {
@@ -248,19 +233,13 @@ namespace Library
                 {
                     case Parser.Status.Start:
                         //code lock com read
-                        if (!_lock)
-                        {
-                            _mutex.WaitOne();
-                            _lock = true;
-                        }
+
+
                         break;
                     case Parser.Status.Stop:
                         //code unlock com read
-                        if (_lock)
-                        {
-                            _mutex.ReleaseMutex();
-                            _lock = false;
-                        }
+
+
                         break;
                 }
             }

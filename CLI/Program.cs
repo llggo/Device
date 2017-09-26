@@ -14,7 +14,7 @@ namespace CLI
     {
         static SerialPort _serialPort;
         static ModBus _modBus = new ModBus();
-        static string _text;
+        static string _text = "";
         static int _address, _command;
         static void Main(string[] args)
         {
@@ -70,22 +70,28 @@ namespace CLI
                         {
                             var _send = true;
 
+                            if (String.IsNullOrEmpty(opt.Address)){
+                                Debug.WriteLine("Address is null");
+                                _send = false;
+                            }
+                            else
+                            {
+                                if (!int.TryParse(opt.Address, out _address))
+                                {
+                                    Debug.WriteLine("Parse address fail: " + opt.Address);
+                                    _send = false;
+                                }
+                            }
+
+                            
+
                             if (opt.Show)
                             {
                                 _command = 2;
 
-                                if (!String.IsNullOrEmpty(opt.Address))
+                                if (opt.Run)
                                 {
-                                    if(!int.TryParse(opt.Address, out _address))
-                                    {
-                                        Debug.WriteLine("Parse address fail: " + opt.Address);
-                                        _send = false;
-                                    }
-                                }
-                                else
-                                {
-                                    Debug.WriteLine("Address is null");
-                                    _send = false;
+                                    _command = 7;
                                 }
 
                                 if (!String.IsNullOrEmpty(opt.Text))
@@ -97,11 +103,19 @@ namespace CLI
                                     Debug.WriteLine("Text is null");
                                     _send = false;
                                 }
+                            }else if(opt.Off)
+                            {
+                                _command = 3;
+                            }
+                            else if(opt.On)
+                            {
+                                _command = 4;
                             }
                             else
                             {
                                 _send = false;
                             }
+
 
                             if (_send)
                             {
@@ -205,6 +219,7 @@ namespace CLI
         [Option('o', "on",
           HelpText = "ex: -s | --show")]
         public bool On { get; set; }
+
         [Option('f', "off",
           HelpText = "ex: -s | --show")]
         public bool Off { get; set; }
@@ -220,7 +235,8 @@ namespace CLI
         [Option('t', "text")]
         public string Text { get; set; }
 
-
+        [Option('r', "run")]
+        public bool Run { get; set; }
 
         [Option('e', "exit", 
           HelpText = "Exit CLI")]

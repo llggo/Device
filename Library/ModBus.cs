@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -104,8 +105,12 @@ namespace Library
                         0x4E, 0x8E, 0x8F, 0x4F, 0x8D, 0x4D, 0x4C, 0x8C, 0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83, 0x41, 0x81, 0x80, 0x40};
     }
 
+    
     public class Parser
     {
+        const int StructCommandLength = 11;
+        const int StructDataLength = 9;
+
         public enum Status { Start = 0x3A, PreDataLength = 100, DataLength = 101, Data = 1, PreStop = 16, Stop = 19 };
         Status _state;
         int _index, _datalength;
@@ -135,8 +140,14 @@ namespace Library
 
         public void Process(byte[] data)
         {
+            if(data.Length > 0)
+            {
+                Debug.WriteLine("Raw Message: {0} - L: {1}", String.Join(", ", data), data.Count());
+            }
+
             foreach (var d in data)
             {
+
                 switch (_state)
                 {
                     case Status.Stop:
@@ -160,12 +171,12 @@ namespace Library
                     case Status.DataLength:
                         _state = Status.Data;
                         _datalength += d * 256;
-                        _buffer = new byte[_datalength + 15];
+                        _buffer = new byte[_datalength + StructCommandLength];
                         _temp[_index] = d;
                         _index++;
                         break;
                     case Status.Data:
-                        if (_index >= _datalength + 13)
+                        if (_index >= _datalength + StructDataLength)
                         {
                             if (d == (int)Status.PreStop)
                             {
