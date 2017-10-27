@@ -13,7 +13,10 @@ namespace Library
     public class SerialPort
     {
 
-        Queue<byte[]> _sendQueue = new Queue<byte[]>();
+        private Queue<byte[]> _sendQueue = new Queue<byte[]>();
+
+        public bool ModBusParser = false;
+
         public enum Status
         {
             Opened,
@@ -21,7 +24,9 @@ namespace Library
             Opening,
             Closing,
             CloseError,
-            OpenError
+            OpenError,
+            SendError,
+            ReceivedEror
         }
 
         private System.IO.Ports.SerialPort _serialPort;
@@ -32,11 +37,13 @@ namespace Library
 
         public event StatusEventHandler StatusChanged;
 
-        public event ReceivedEventHandler ModBusMessageParsed;
+        public event ReceivedEventHandler DataReceived;
 
         private BackgroundWorker _comControlWorker, _comReadWorker, _comSendWorker;
 
-        Parser _parser;
+        private Parser _parser;
+
+        private bool _isRead = false;
 
         public SerialPort(System.IO.Ports.SerialPort serialPort)
         {
@@ -60,6 +67,7 @@ namespace Library
             _comReadWorker = new BackgroundWorker();
             _comReadWorker.WorkerSupportsCancellation = true;
             _comReadWorker.DoWork += _comReadWorker_DoWork;
+            _comReadWorker.RunWorkerCompleted += _comReadWorker_RunWorkerCompleted;
 
             _comSendWorker = new BackgroundWorker();
             _comSendWorker.WorkerSupportsCancellation = true;
@@ -71,21 +79,37 @@ namespace Library
 
         }
 
+        private void _comReadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            _isRead = false;
+            Debug.WriteLine("Woker read com run completed");
+        }
+
         private void _parser_MessageParsed(byte[] data)
         {
-            ModBusMessageParsed(data);
+            DataReceived(data);
         }
 
         private void _serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (!_comReadWorker.IsBusy)
+            Debug.WriteLine("Serial port data received");
+
+            if (!_comReadWorker.IsBusy && ModBusParser)
             {
+                _isRead = true;
                 _comReadWorker.RunWorkerAsync();
+            }
+            else
+            {
+                Thread.Sleep(100);
+                DataReceived(ReadByteInPort());
             }
         }
 
         private byte[] ReadByteInPort()
         {
+            //Thread.Sleep(1000);
+
             byte[] r = new byte[_serialPort.BytesToRead];
             try
             {
@@ -93,12 +117,15 @@ namespace Library
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.ToString());
+                Debug.WriteLine("Exception read byte in port: " + ex.ToString());
             }
             finally
             {
                 if (_serialPort.BytesToRead != 0) _serialPort.DiscardInBuffer();
+
+                Debug.WriteLine("Read byte in port finally");
             }
+
             return r;
         }
 
@@ -145,11 +172,6 @@ namespace Library
 
                         _serialPort.Open();
 
-                        if (!_comReadWorker.IsBusy)
-                        {
-                            _comReadWorker.RunWorkerAsync();
-                        }
-
                         if (!_comSendWorker.IsBusy)
                         {
                             _comSendWorker.RunWorkerAsync();
@@ -159,7 +181,7 @@ namespace Library
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex);
+                        Debug.WriteLine("Exception com control do work: " + ex);
 
                         if(loop >= 5)
                         {
@@ -196,6 +218,7 @@ namespace Library
                     }
                     catch
                     {
+                        Debug.WriteLine("Exception com control do work: ");
                         StatusChanged(_serialPort, Status.CloseError);
                     }
                 }
@@ -206,25 +229,33 @@ namespace Library
         {
             while (!_comSendWorker.CancellationPending && _sendQueue.Count != 0)
             {
-                var d = _sendQueue.Dequeue();
-
-                if (_serialPort != null && _serialPort.IsOpen)
+                if (!_isRead)
                 {
-                    try
-                    {
-                        _serialPort.Write(d, 0, d.Length);
+                    var d = _sendQueue.Dequeue();
 
-                    }
-                    catch (Exception ex)
+                    if (_serialPort != null && _serialPort.IsOpen)
                     {
-                        Debug.WriteLine("Send To COM Error: " + ex);
+                        try
+                        {
+                            var s = DateTime.Now.Millisecond;
+                            Debug.WriteLine("--- Serial port send --- \n Data: {0} \n Length: {1}", String.Join(" ", d), d.Count());
+                            _serialPort.Write(d, 0, d.Length);
+                            Debug.WriteLine(" E: {0}ms \n--- End ---", DateTime.Now.Millisecond - s);
+                        }
+                        catch (Exception ex)
+                        {
+                            StatusChanged(_serialPort, Status.SendError);
+                            Debug.WriteLine("Send to com error: " + ex);
+                        }
                     }
                 }
+
             }
         }
         private void _comReadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            
+            Debug.WriteLine("Worker read com start");
+
             while (!_comReadWorker.CancellationPending)
             {
                 _parser.Process(ReadByteInPort());
@@ -233,13 +264,18 @@ namespace Library
                 {
                     case Parser.Status.Start:
                         //code lock com read
-
+                        Debug.WriteLine("Parser start");
 
                         break;
                     case Parser.Status.Stop:
                         //code unlock com read
+                        Debug.WriteLine("Parser stop");
 
 
+                        if (_comReadWorker.IsBusy)
+                        {
+                            _comReadWorker.CancelAsync();
+                        }
                         break;
                 }
             }

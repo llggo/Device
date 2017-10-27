@@ -11,9 +11,9 @@ namespace Library
     {
         int _messageId;
 
-        public ModBus()
+        public ModBus(int messageId = 1)
         {
-            MessageId = 1;
+            MessageId = messageId;
         }
 
         private int MessageId { get => _messageId; set => _messageId = value; }
@@ -26,12 +26,17 @@ namespace Library
 
             for (int i = 0; i < _temp.Length; i++)
             {
-                var _t = Encoding.ASCII.GetBytes(_temp[i]);
+                var _t = Encoding.UTF8.GetBytes(_temp[i]);
                 Buffer.BlockCopy(_t, 0, _data, i * 4, _t.Length);
             }
 
             return Build(Device, Address, Command, _data);
 
+        }
+
+        public static int GetMessageId(byte[] data)
+        {
+            return (data[10] << 24) + (data[9] << 16) + (data[8] << 8) + data[7];
         }
 
         public byte[] Build(int Device, int Address, int Command, byte[] Data)

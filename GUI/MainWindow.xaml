@@ -53,29 +53,11 @@
                 Background="Gray" />
 
             <StackPanel Grid.Column="0" Orientation="Horizontal">
-
-                <fa:ImageAwesome
+                <!--<fa:ImageAwesome
                         Margin="10,5,0,5"
                         HorizontalAlignment="Left"
                         Foreground="#FFE0330C"
-                        Icon="Usb" />
-                <fa:ImageAwesome
-                        Margin="10,5,0,5"
-                        HorizontalAlignment="Left"
-                        Foreground="#FFE0330C"
-                        Icon="Usb" />
-                <fa:ImageAwesome
-                        Margin="10,5,0,5"
-                        HorizontalAlignment="Left"
-                        Foreground="#FFE0330C"
-                        Icon="Usb" />
-
-
-                <fa:ImageAwesome
-                        Margin="10,5,0,5"
-                        HorizontalAlignment="Left"
-                        Foreground="#FFE0330C"
-                        Icon="Usb" />
+                        Icon="Usb" />-->
 
             </StackPanel>
 
@@ -86,10 +68,10 @@
                 Margin="5,0,0,0"
                 Name="NotificationPanel"
                 Orientation="Horizontal">
-                <fa:ImageAwesome
+                <!--<fa:ImageAwesome
                     Foreground="#FFE0330C"
                     Icon="Usb"
-                    Name="UsbConnect" />
+                    Name="UsbConnect" />-->
             </StackPanel>
 
         </Grid>

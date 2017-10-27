@@ -65,6 +65,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Constant.cs" />
     <Compile Include="UC\Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
@@ -117,6 +118,14 @@
     <ProjectReference Include="..\Communication\Communication.csproj">
       <Project>{aea52788-7804-4c93-bd26-1f2b67a573a1}</Project>
       <Name>Communication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Device\Device.csproj">
+      <Project>{a46b78ae-a65b-4eed-a583-bff5bca77f38}</Project>
+      <Name>Device</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Hubs\Hubs.csproj">
+      <Project>{26c61778-1316-455d-84e6-e6077ffbf2d7}</Project>
+      <Name>Hubs</Name>
     </ProjectReference>
     <ProjectReference Include="..\IO\IO.csproj">
       <Project>{8f47b277-8c1a-492b-8487-9d005b66f989}</Project>

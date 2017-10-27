@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{3F9E352F-E375-4131-BF59-B5C67DE5399F}"
 EndProject
@@ -14,6 +14,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Device", "Device\Device.csproj", "{A46B78AE-A65B-4EED-A583-BFF5BCA77F38}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI", "CLI\CLI.csproj", "{0EC04164-8011-43A2-9548-BE1C4321D4F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST PRINTER", "TEST PRINTER\TEST PRINTER.csproj", "{4EE527C7-4A15-47B1-B720-B0E3544809C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{218494F0-CC12-4AD4-ADE9-8E98CFDD85DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hubs", "Hubs\Hubs.csproj", "{26C61778-1316-455D-84E6-E6077FFBF2D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vibrate", "Vibrate\Vibrate.csproj", "{B4483937-8745-4C5D-8595-A380D2B85484}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vibrate CLI", "Vibrate CLI\Vibrate CLI.csproj", "{BE593137-880E-4DA4-B666-4321F443F18F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +55,26 @@ Global
 		{0EC04164-8011-43A2-9548-BE1C4321D4F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EC04164-8011-43A2-9548-BE1C4321D4F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EC04164-8011-43A2-9548-BE1C4321D4F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EE527C7-4A15-47B1-B720-B0E3544809C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EE527C7-4A15-47B1-B720-B0E3544809C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EE527C7-4A15-47B1-B720-B0E3544809C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EE527C7-4A15-47B1-B720-B0E3544809C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{218494F0-CC12-4AD4-ADE9-8E98CFDD85DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{218494F0-CC12-4AD4-ADE9-8E98CFDD85DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{218494F0-CC12-4AD4-ADE9-8E98CFDD85DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{218494F0-CC12-4AD4-ADE9-8E98CFDD85DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26C61778-1316-455D-84E6-E6077FFBF2D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26C61778-1316-455D-84E6-E6077FFBF2D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26C61778-1316-455D-84E6-E6077FFBF2D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26C61778-1316-455D-84E6-E6077FFBF2D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4483937-8745-4C5D-8595-A380D2B85484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4483937-8745-4C5D-8595-A380D2B85484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4483937-8745-4C5D-8595-A380D2B85484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4483937-8745-4C5D-8595-A380D2B85484}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE593137-880E-4DA4-B666-4321F443F18F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE593137-880E-4DA4-B666-4321F443F18F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE593137-880E-4DA4-B666-4321F443F18F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE593137-880E-4DA4-B666-4321F443F18F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

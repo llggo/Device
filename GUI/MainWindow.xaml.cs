@@ -18,6 +18,9 @@ using System.Management;
 using FontAwesome.WPF;
 using System.Windows.Media.Animation;
 using System.Windows.Markup;
+using System.Diagnostics;
+using Device;
+using System.Threading;
 
 namespace GUI
 {
@@ -26,7 +29,13 @@ namespace GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        Library.SerialPort com;
+        Hubs.Hubs hubs = new Hubs.Hubs();
+
+        ModBus _modBus = new ModBus();
+
+        Icon _iconSingal = new Icon(FontAwesomeIcon.Exchange);
+        Icon _iconUsb = new Icon(FontAwesomeIcon.Usb);
+
         public MainWindow()
         {
             InitializeComponent();
@@ -41,31 +50,86 @@ namespace GUI
             MainTabItem.Content = new UC.Main();
 
             #region Status Bar
-            var Singal = new Icon(FontAwesomeIcon.Exchange);
+            NotificationPanel.Children.Add(_iconSingal.Get());
+            NotificationPanel.Children.Add(_iconUsb.Get());
 
-            NotificationPanel.Children.Add(Singal.Get());
+            //Singal.Blink(0.5);
+            //Singal.Color(Brushes.Green);
 
-            Singal.Blink(0.5);
-            Singal.Color(Brushes.Green);
+            //Animation.Blink(UsbConnect, 0.1);
 
             #endregion
 
             #endregion
 
-
-
-
-
-            /// Serial Port
-            System.IO.Ports.SerialPort port = new System.IO.Ports.SerialPort("COM2");
-            com = new Library.SerialPort(port);
-            com.StatusChanged += Com_StatusChanged;
+            hubs.ComStatusChanged += Hubs_ComStatusChanged;
+            hubs.KeyboardStatus += Hubs_KeyboardStatus;
+            hubs.Start();
         }
 
-        private void Com_StatusChanged(System.IO.Ports.SerialPort serialPort, Library.SerialPort.Status status)
+        private void Hubs_KeyboardStatus(Communication.Keyboard.ServerStatus status)
         {
+            switch (status)
+            {
+                case Communication.Keyboard.ServerStatus.Connected:
+                    Dispatcher.Invoke(() =>
+                    {
+                        _iconSingal.Blink(null);
+                        _iconSingal.Color(Brushes.Green);
+                    });
+                    break;
 
-            //labelStatus.Dispatcher.BeginInvoke((Action)(() => labelStatus.Content = status.ToString()));
+                case Communication.Keyboard.ServerStatus.Connecting:
+                    Dispatcher.Invoke(() =>
+                    {
+                        _iconSingal.Blink(1);
+                        _iconSingal.Color(Brushes.Black);
+                    });
+                    break;
+
+                case Communication.Keyboard.ServerStatus.Disconnected:
+                    Dispatcher.Invoke(() =>
+                    {
+                        _iconSingal.Blink(0.1);
+                        _iconSingal.Color(Brushes.Red);
+                    });
+                    break;
+            }
+        }
+
+        private void Hubs_ComStatusChanged(System.IO.Ports.SerialPort serialPort, Library.SerialPort.Status status)
+        {
+            Debug.WriteLine(status);
+
+            switch (status)
+            {
+                case Library.SerialPort.Status.Opened:
+                    Dispatcher.Invoke(() =>
+                    {
+                        _iconUsb.Blink(null);
+                        _iconUsb.Color(Brushes.Green);
+                    });
+
+                    break;
+
+                case Library.SerialPort.Status.Opening:
+                    Dispatcher.Invoke(() =>
+                    {
+                        _iconUsb.Blink(1);
+                        _iconUsb.Color(Brushes.Black);
+                    });
+
+                    break;
+
+                case Library.SerialPort.Status.OpenError:
+                    Dispatcher.Invoke(() =>
+                    {
+                        _iconUsb.Blink(0.1);
+                        _iconUsb.Color(Brushes.Red);
+                    });
+
+                    break;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -90,7 +154,7 @@ namespace GUI
 
         private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+
         }
     }
 }
