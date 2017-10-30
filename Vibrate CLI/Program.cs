@@ -1,6 +1,6 @@
-﻿using Library;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,6 +11,7 @@ namespace Vibrate_CLI
     class Program
     {
         static SerialPort serialPort;
+
         static void Main(string[] args)
         {
             if (args.Length >= 1)
@@ -31,13 +32,23 @@ namespace Vibrate_CLI
                     com.ToUpper();
 
 
-                    serialPort = new SerialPort(new System.IO.Ports.SerialPort(com, 9600, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One));
+                    serialPort = new SerialPort(com, 9600, Parity.None, 8, StopBits.One);
 
-                    serialPort.StatusChanged += SerialPort_StatusChanged;
+                    serialPort.DataReceived += SerialPort_DataReceived;
 
-                    serialPort.DataReceived += SerialPort_ModBusMessageParsed;
+                    try
+                    {
+                        Console.WriteLine("{0} opening", com);
 
-                    serialPort.Open();
+                        serialPort.Open();
+
+                        Console.WriteLine("{0} opened", com);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("{0} error: {1}", com, ex);
+                    }
+                    
 
                 }
             }
@@ -66,27 +77,31 @@ namespace Vibrate_CLI
                     {
                         if (commands[1].Equals("vibrate"))
                         {
-                            serialPort.Send(SyscallCommandVibrate(commands[2]));
+                            var d = SyscallCommandVibrate(commands[2]);
+
+                            serialPort.Write(d, 0, d.Length);
+
+                            Console.WriteLine("Send: [{0}] - L: {1}", String.Join(" ", d), d.Length);
                         }
 
                         if (commands[1].Equals("set"))
                         {
-                            serialPort.Send(SyscallCommandSetAddress(commands[2]));
+                            var d = SyscallCommandSetAddress(commands[2]);
+
+                            serialPort.Write(d, 0, d.Length);
+
+                            Console.WriteLine("Send: [{0}] - L: {1}", String.Join(" ", d), d.Length);
                         }
                     }
                 }
             }
         }
 
-        private static void SerialPort_ModBusMessageParsed(byte[] data)
+        private static void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            Console.WriteLine("Received [{0}]", String.Join(" ", data));
+            Console.WriteLine("Received event");
         }
 
-        private static void SerialPort_StatusChanged(System.IO.Ports.SerialPort serialPort, SerialPort.Status status)
-        {
-            Console.WriteLine(status);
-        }
 
         private static byte[] SyscallCommandVibrate(string Address)
         {
